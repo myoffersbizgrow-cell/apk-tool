@@ -4,14 +4,14 @@ set -o errexit
 
 echo "📦 Starting Render build process..."
 
-# Update package list
-apt-get update
+# ✅ Update package list
+apt-get update -y
 
 # ✅ Install Java (OpenJDK 17)
 echo "☕ Installing Java..."
-apt-get install -y openjdk-17-jre wget unzip
+apt-get install -y openjdk-17-jre-headless wget unzip
 
-# Verify Java installation
+# ✅ Verify Java installation
 echo "✅ Java version:"
 java -version
 
