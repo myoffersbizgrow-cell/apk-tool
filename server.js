@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
+const path = require('path');  // ✅ Ye line add karein
 const fs = require('fs-extra');
 const convertRoute = require('./routes/convert');
 
@@ -12,31 +12,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Static files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// ✅ STATIC FILES (public folder se serve karein)
+app.use(express.static('public'));
 
-// ✅ ROOT ROUTE - YEH ADD KAREIN
+// ✅ ROOT ROUTE - HTML PAGE SERVE KAREIN
 app.get('/', (req, res) => {
-  res.json({
-    name: 'APK to AAB Converter API',
-    version: '1.0.0',
-    status: 'online',
-    endpoints: {
-      'Upload & Convert': 'POST /api/convert',
-      'Download': 'GET /api/download/:filename',
-      'Health Check': 'GET /health',
-      'Job Status': 'GET /api/status/:jobId'
-    },
-    usage: {
-      method: 'POST',
-      url: '/api/convert',
-      body: {
-        apk: 'file (multipart/form-data)',
-        minSdk: 'number (optional, default: 21)',
-        targetSdk: 'number (optional, default: 33)'
-      }
-    }
-  });
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Health check
