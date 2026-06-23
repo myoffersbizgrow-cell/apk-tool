@@ -7,11 +7,12 @@ echo "📦 Starting Render build process..."
 # Update package list
 apt-get update
 
-# Install Java (OpenJDK 17)
+# ✅ Install Java (OpenJDK 17)
 echo "☕ Installing Java..."
 apt-get install -y openjdk-17-jre wget unzip
 
-# Check Java installation
+# Verify Java installation
+echo "✅ Java version:"
 java -version
 
 # Download Android tools
@@ -35,7 +36,7 @@ echo "📦 Downloading Bundletool..."
 wget -q https://github.com/google/bundletool/releases/download/1.16.1/bundletool-all-1.16.1.jar
 mv bundletool-all-1.16.1.jar bundletool.jar
 
-# Download Android.jar (from public mirror - use with caution)
+# Download Android.jar (from public mirror)
 echo "📦 Downloading android.jar..."
 wget -q https://github.com/airwire/android-platforms/raw/main/android-33.jar
 mv android-33.jar android.jar
