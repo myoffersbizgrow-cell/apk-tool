@@ -5,81 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>APK to AAB Converter</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 500px;
-      margin: 50px auto;
-      padding: 20px;
-      background: #f5f5f5;
-    }
-    .container {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    h2 {
-      color: #333;
-      text-align: center;
-    }
-    input[type="file"] {
-      display: block;
-      margin: 15px 0;
-      padding: 10px;
-      border: 2px dashed #ccc;
-      border-radius: 5px;
-      width: 100%;
-    }
-    input[type="number"] {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      box-sizing: border-box;
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    button:hover {
-      background: #0056b3;
-    }
-    #status {
-      margin-top: 20px;
-      padding: 10px;
-      border-radius: 5px;
-      display: none;
-    }
+    body { font-family: Arial; max-width: 500px; margin: 50px auto; padding: 20px; background: #f5f5f5; }
+    .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    h2 { color: #333; text-align: center; }
+    input[type="file"] { display: block; margin: 15px 0; padding: 10px; border: 2px dashed #ccc; border-radius: 5px; width: 100%; box-sizing: border-box; }
+    input[type="number"] { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+    button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-top: 10px; }
+    button:hover { background: #0056b3; }
+    #status { margin-top: 20px; padding: 10px; border-radius: 5px; display: none; }
     .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
     .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
     .loading { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
-    #progress {
-      margin-top: 10px;
-      background: #e9ecef;
-      border-radius: 5px;
-      overflow: hidden;
-      display: none;
-    }
-    #progress-bar {
-      width: 0%;
-      height: 20px;
-      background: #28a745;
-      transition: width 0.3s;
-    }
+    #progress { margin-top: 10px; background: #e9ecef; border-radius: 5px; overflow: hidden; display: none; }
+    #progress-bar { width: 0%; height: 20px; background: #28a745; transition: width 0.3s; }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>📱 APK to AAB Converter</h2>
-    <p style="text-align:center; color:#666;">Upload APK file to convert to Android App Bundle</p>
+    <p style="text-align:center; color:#666;">Upload APK to convert to Android App Bundle</p>
     
     <form id="uploadForm" enctype="multipart/form-data">
       <input type="file" name="apk" accept=".apk" required>
@@ -89,9 +33,7 @@
     </form>
 
     <div id="status"></div>
-    <div id="progress">
-      <div id="progress-bar"></div>
-    </div>
+    <div id="progress"><div id="progress-bar"></div></div>
   </div>
 
   <script>
@@ -100,7 +42,7 @@
     const progressDiv = document.getElementById('progress');
     const progressBar = document.getElementById('progress-bar');
 
-    // ✅ YAHAN APNI RENDER URL DALEN
+    // ✅ LIVE URL - YAHAN APNI URL DAALEIN
     const API_URL = 'https://apk-tool-j85w.onrender.com';
 
     form.addEventListener('submit', async (e) => {
@@ -108,16 +50,14 @@
       
       const formData = new FormData(form);
       
-      // Show progress
       statusDiv.style.display = 'block';
       statusDiv.className = 'loading';
-      statusDiv.textContent = '⏳ Uploading and converting... Please wait (may take 2-5 minutes)';
+      statusDiv.textContent = '⏳ Uploading and converting... Please wait (2-5 minutes)';
       
       progressDiv.style.display = 'block';
       progressBar.style.width = '0%';
 
       try {
-        // Simulate progress
         let progress = 0;
         const progressInterval = setInterval(() => {
           progress += 5;
@@ -126,7 +66,6 @@
           }
         }, 500);
 
-        // Send request
         const response = await fetch(`${API_URL}/api/convert`, {
           method: 'POST',
           body: formData
@@ -149,15 +88,13 @@
           `;
         } else {
           statusDiv.className = 'error';
-          statusDiv.textContent = '❌ Error: ' + (data.error || 'Unknown error occurred');
+          statusDiv.textContent = '❌ Error: ' + (data.error || 'Unknown error');
         }
       } catch (error) {
         statusDiv.className = 'error';
         statusDiv.textContent = '❌ Network Error: ' + error.message;
       } finally {
-        setTimeout(() => {
-          progressDiv.style.display = 'none';
-        }, 3000);
+        setTimeout(() => { progressDiv.style.display = 'none'; }, 3000);
       }
     });
   </script>
