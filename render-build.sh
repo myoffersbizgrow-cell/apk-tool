@@ -7,20 +7,21 @@ echo "📦 Starting Render build process..."
 # ✅ Update package list
 apt-get update -y
 
-# ✅ Install Java (OpenJDK 17)
+# ✅ Install Java (OpenJDK 17) with all dependencies
 echo "☕ Installing Java..."
-apt-get install -y openjdk-17-jre-headless wget unzip
+apt-get install -y openjdk-17-jdk-headless wget unzip curl
 
 # ✅ Verify Java installation
 echo "✅ Java version:"
 java -version
+which java
 
 # Download Android tools
 echo "🔧 Downloading Android tools..."
 mkdir -p tools
 cd tools
 
-# Download APKTool
+# Download APKTool (Linux version)
 echo "📦 Downloading APKTool..."
 wget -q https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/linux/apktool
 chmod +x apktool
@@ -44,11 +45,11 @@ mv android-33.jar android.jar
 # Go back to project root
 cd ..
 
-# Verify tools
+# ✅ Verify tools
 echo "✅ Tools downloaded:"
 ls -la tools/
 
-# Install Node dependencies
+# ✅ Install Node dependencies
 echo "📦 Installing Node dependencies..."
 npm install
 
