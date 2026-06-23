@@ -15,8 +15,29 @@ app.use(express.urlencoded({ extended: true }));
 // Static files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Routes
-app.use('/api', convertRoute);
+// ✅ ROOT ROUTE - YEH ADD KAREIN
+app.get('/', (req, res) => {
+  res.json({
+    name: 'APK to AAB Converter API',
+    version: '1.0.0',
+    status: 'online',
+    endpoints: {
+      'Upload & Convert': 'POST /api/convert',
+      'Download': 'GET /api/download/:filename',
+      'Health Check': 'GET /health',
+      'Job Status': 'GET /api/status/:jobId'
+    },
+    usage: {
+      method: 'POST',
+      url: '/api/convert',
+      body: {
+        apk: 'file (multipart/form-data)',
+        minSdk: 'number (optional, default: 21)',
+        targetSdk: 'number (optional, default: 33)'
+      }
+    }
+  });
+});
 
 // Health check
 app.get('/health', (req, res) => {
@@ -26,10 +47,13 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Routes
+app.use('/api', convertRoute);
+
 // Check required tools
 function checkTools() {
   const toolsPath = path.join(__dirname, 'tools');
-  const required = ['apktool.jar', 'aapt2.exe', 'bundletool.jar', 'android.jar'];
+  const required = ['apktool.jar', 'aapt2', 'bundletool.jar', 'android.jar'];
   const available = {};
   
   required.forEach(tool => {
@@ -39,6 +63,14 @@ function checkTools() {
   return available;
 }
 
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ 
+    error: 'Endpoint not found',
+    available_endpoints: ['GET /', 'GET /health', 'POST /api/convert', 'GET /api/download/:filename']
+  });
+});
+
 // Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -46,6 +78,7 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log('Tools status:', checkTools());
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`📁 Tools status:`, checkTools());
+  console.log(`📍 Visit: http://localhost:${PORT}`);
 });
