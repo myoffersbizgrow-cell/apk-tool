@@ -5,14 +5,12 @@ const fs = require('fs-extra');
 const path = require('path');
 const AdmZip = require('adm-zip');
 const archiver = require('archiver');
-const rimraf = require('rimraf');
 
 class APKConverter {
   constructor() {
     this.toolsPath = path.join(__dirname, '../tools');
     this.tempPath = path.join(__dirname, '../temp');
     this.java = 'java';
-    this.javaHome = process.env.JAVA_HOME || 'java';
   }
 
   async convert(apkPath, outputDir, options) {
@@ -48,14 +46,14 @@ class APKConverter {
       await this.buildAab(baseZip, aabPath);
 
       // 6. Clean up temporary files
-      await rimraf.sync(workDir);
+      await fs.remove(workDir).catch(err => console.warn('Cleanup warning:', err.message));
 
       console.log(`Conversion complete: ${aabPath}`);
       return aabPath;
 
     } catch (error) {
       // Clean up on error
-      await rimraf.sync(workDir).catch(() => {});
+      await fs.remove(workDir).catch(err => console.warn('Cleanup warning:', err.message));
       throw error;
     }
   }
@@ -69,7 +67,7 @@ class APKConverter {
 
   async compileResources(decompileDir, outputZip) {
     const resDir = path.join(decompileDir, 'res');
-    const cmd = `${this.getToolPath('aapt2.exe')} compile --dir ${resDir} -o ${outputZip}`;
+    const cmd = `${this.getToolPath('aapt2')} compile --dir ${resDir} -o ${outputZip}`;
     console.log('Compiling resources...');
     await this.execWithTimeout(cmd, 30000);
     console.log('Resources compiled successfully');
@@ -86,7 +84,7 @@ class APKConverter {
       await this.fixPublicXml(publicXml);
     }
 
-    const cmd = `${this.getToolPath('aapt2.exe')} link --proto-format -o ${outputZip} ` +
+    const cmd = `${this.getToolPath('aapt2')} link --proto-format -o ${outputZip} ` +
                 `-I ${androidJar} --manifest ${manifest} ` +
                 `--min-sdk-version ${minSdk} --target-sdk-version ${targetSdk} ` +
                 `--version-code 1 --version-name 1.0 -R ${resZip} --auto-add-overlay`;
@@ -97,7 +95,7 @@ class APKConverter {
       console.log('Resources linked successfully');
     } catch (error) {
       console.warn('Link failed, trying with --legacy flag...');
-      const legacyCmd = `${this.getToolPath('aapt2.exe')} link --legacy -o ${outputZip} ` +
+      const legacyCmd = `${this.getToolPath('aapt2')} link --legacy -o ${outputZip} ` +
                         `-I ${androidJar} --manifest ${manifest} ` +
                         `--min-sdk-version ${minSdk} --target-sdk-version ${targetSdk} ` +
                         `--version-code 1 --version-name 1.0 -R ${resZip} --auto-add-overlay`;
@@ -115,12 +113,9 @@ class APKConverter {
   async fixPublicXml(publicXmlPath) {
     console.log('Fixing public.xml issues...');
     let content = await fs.readFile(publicXmlPath, 'utf8');
-    
-    // Remove lines with $ in resource names
     const lines = content.split('\n');
     const filtered = lines.filter(line => !line.includes('$'));
     content = filtered.join('\n');
-    
     await fs.writeFile(publicXmlPath, content, 'utf8');
     console.log('public.xml fixed');
   }
@@ -132,7 +127,7 @@ class APKConverter {
   async execWithTimeout(cmd, timeout) {
     return new Promise((resolve, reject) => {
       const child = exec(cmd, { 
-        maxBuffer: 50 * 1024 * 1024, // 50MB buffer
+        maxBuffer: 50 * 1024 * 1024,
         timeout: timeout,
         windowsHide: true
       }, (error, stdout, stderr) => {
